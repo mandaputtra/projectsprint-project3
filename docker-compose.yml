@@ -1,0 +1,21 @@
+services:
+  db:
+    container_name: projectsprint-project2
+    image: postgres:latest
+    shm_size: 1g
+    command: -c 'max_connections=1000'
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+    environment:
+      - POSTGRES_DB=projectsone
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+volumes:
+  pgdata:
+    driver: local
