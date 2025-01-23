@@ -8,18 +8,19 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/gorm"
 
-	"github.com/mandaputtra/projectsprint-projects2/libs/utils"
-	"github.com/mandaputtra/projectsprint-projects2/services/ms-users-svc/config"
-	"github.com/mandaputtra/projectsprint-projects2/services/ms-users-svc/database"
-	"github.com/mandaputtra/projectsprint-projects2/services/ms-users-svc/handlers"
+	"project3/libs/utils"
+	"project3/services/ms-upp-svc/config"
+	"project3/services/ms-upp-svc/database"
+	"project3/services/ms-upp-svc/handlers"
 )
 
 // Controller
-func setupRouter(db *gorm.DB) *gin.Engine {
+func setupRouter(db *gorm.DB, cfg *config.Environment) *gin.Engine {
 	r := gin.Default()
 
 	api := &handlers.APIEnv{
-		DB: db,
+		DB:  db,
+		ENV: cfg,
 	}
 
 	r.Use(utils.CheckContentType)
@@ -32,10 +33,10 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 
 	v1 := r.Group("/v1")
 	{
-		v1.POST("/login/email", api.Login)
-		v1.POST("/register/email", api.Register)
-		v1.POST("/login/phone", api.Login)
-		v1.POST("/register/phone", api.Register)
+		v1.POST("/login/email", api.LoginWithEmail)
+		v1.POST("/register/email", api.RegisterWithEmail)
+		v1.POST("/login/phone", api.LoginWithEmail)
+		v1.POST("/register/phone", api.RegisterWithEmail)
 		v1.GET("/user", utils.Authorization, api.GetUser)
 		v1.PATCH("/user", utils.Authorization, api.UpdateUser)
 	}
@@ -48,7 +49,7 @@ func main() {
 	cfg := config.EnvironmentConfig()
 	db := database.ConnectDatabase(cfg)
 
-	r := setupRouter(db)
+	r := setupRouter(db, &cfg)
 	if err := r.Run(":" + cfg.PORT); err != nil {
 		log.Fatalf("Could not start server: %v", err)
 	}
