@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 
+	"project3/services/ms-upp-svc/config"
+
 	"github.com/google/uuid"
-	"github.com/mandaputtra/projectsprint-projects2/services/ms-users-svc/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
