@@ -32,8 +32,10 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 
 	v1 := r.Group("/v1")
 	{
-		v1.POST("/login", api.Login)
-		v1.POST("/register", api.Register)
+		v1.POST("/login/email", api.Login)
+		v1.POST("/register/email", api.Register)
+		v1.POST("/login/phone", api.Login)
+		v1.POST("/register/phone", api.Register)
 		v1.GET("/user", utils.Authorization, api.GetUser)
 		v1.PATCH("/user", utils.Authorization, api.UpdateUser)
 	}

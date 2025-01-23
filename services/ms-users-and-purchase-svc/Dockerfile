@@ -14,13 +14,13 @@ RUN go mod download
 COPY . .
 
 # Build the Go binary for ARM64
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o ms-users-svc .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o ms-users-and-purchase-svc .
 
 # Use a minimal Alpine image for the final stage
 FROM alpine:latest AS final
 
 # Copy the binary from the builder stage
-COPY --from=builder /app/ms-users-svc /ms-users-svc
+COPY --from=builder /app/ms-users-and-purchase-svc /ms-users-and-purchase-svc
 
 # Set the entry point (optional)
-ENTRYPOINT ["/ms-users-svc"]
+ENTRYPOINT ["/ms-users-and-purchase-svc"]
