@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
-	"net/url"
 	"path/filepath"
 	"strings"
 
@@ -28,14 +27,6 @@ type APIEnv struct {
 }
 
 // Utils
-func validateURIWithTLD(uri string) bool {
-	parsedURI, err := url.ParseRequestURI(uri)
-	if err != nil {
-		return false
-	}
-	return strings.Contains(parsedURI.Host, ".")
-}
-
 func isValidFile(file *multipart.FileHeader) (bool, string) {
 	allowedExtensions := map[string]bool{
 		".jpeg": true,
@@ -95,7 +86,6 @@ func (a *APIEnv) LoginWithEmail(c *gin.Context) {
 		"phone": user.Phone,
 		"token": tokenString,
 	})
-	return
 }
 
 func (a *APIEnv) RegisterWithEmail(c *gin.Context) {
@@ -138,7 +128,6 @@ func (a *APIEnv) RegisterWithEmail(c *gin.Context) {
 		"email": user.Email,
 		"token": tokenString,
 	})
-	return
 }
 
 func (a *APIEnv) GetUser(c *gin.Context) {
@@ -180,7 +169,7 @@ func (a *APIEnv) UpdateUser(c *gin.Context) {
 	// user.Email = ...
 
 	if err := db.Save(&user).Error; err != nil {
-		if err != nil && strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			c.JSON(http.StatusConflict, gin.H{"error": "Failed to update user"})
 			return
 		}
