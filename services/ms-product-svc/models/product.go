@@ -10,12 +10,12 @@ import (
 type Product struct {
 	ID               string `gorm:"primaryKey"`
 	UserID           string `gorm:"type:varchar(255);null"`
-	Name             string `gorm:"type:varchar(100);null"`
+	Name             string `gorm:"type:varchar(32);null"`
 	CategoryID       string `gorm:"type:varchar(255);not null"`
 	CategoryName     string `gorm:"type:varchar(100);not null"`
-	Qty              int
-	Price            int
-	Sku              string `gorm:"type:varchar(100);null"`
+	Qty              int    `gorm:"not null;default:1"`
+	Price            int    `gorm:"not null;default:100"`
+	Sku              string `gorm:"type:varchar(32);null"`
 	FileID           string `gorm:"type:varchar(255);null"`
 	FileURI          string `gorm:"type:varchar(255);null"`
 	FileThumbnailURI string `gorm:"type:varchar(255);null"`
