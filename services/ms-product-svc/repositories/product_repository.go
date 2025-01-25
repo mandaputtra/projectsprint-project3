@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/mandaputtra/projectsprint-projects3/services/ms-product-svc/models"
@@ -25,43 +26,66 @@ func (r *ProductRepository) Create(Product *models.Product) (*models.Product, er
 }
 
 func (r *ProductRepository) GetAll(params map[string]interface{}) ([]*models.Product, error) {
-	var activities []*models.Product
+	var products []*models.Product
 	query := r.db.Model(&models.Product{})
 
-	if ProductType, ok := params["ProductType"].(string); ok && ProductType != "" {
-		query = query.Where("Product_type_name = ?", ProductType)
+	// Filter by productId
+	if productId, ok := params["productId"].(string); ok && productId != "" {
+		query = query.Where("id = ?", productId)
 	}
 
-	if doneAtFrom, ok := params["doneAtFrom"].(time.Time); ok {
-		doneAtFrom = doneAtFrom.UTC()
-		query = query.Where("done_at >= ?", doneAtFrom)
+	// Filter by sku
+	if sku, ok := params["sku"].(string); ok && sku != "" {
+		query = query.Where("sku = ?", sku)
 	}
 
-	if doneAtTo, ok := params["doneAtTo"].(time.Time); ok {
-		doneAtTo = doneAtTo.UTC()
-		query = query.Where("done_at <= ?", doneAtTo)
+	// Filter by category
+	if category, ok := params["category"].(string); ok && category != "" {
+		query = query.Where("category_name ILIKE ?", "%"+category+"%")
 	}
 
-	if min, ok := params["caloriesBurnedMin"].(int); ok && min > 0 {
-		query = query.Where("calories_burned >= ?", min)
+	// Filter by exact search (name)
+	if search, ok := params["search"].(string); ok && search != "" {
+		query = query.Where("name ILIKE ?", "%"+search+"%")
 	}
 
-	if max, ok := params["caloriesBurnedMax"].(int); ok && max > 0 {
-		query = query.Where("calories_burned <= ?", max)
+	// Handle sorting (newest, cheapest, sold-x)
+	if sortBy, ok := params["sortBy"].(string); ok && sortBy != "" {
+		switch {
+		case sortBy == "newest":
+			query = query.Order("created_at DESC, updated_at DESC")
+		case sortBy == "cheapest":
+			query = query.Order("price ASC")
+		case len(sortBy) > 5 && sortBy[:5] == "sold-":
+			if seconds, err := strconv.Atoi(sortBy[5:]); err == nil {
+				timeLimit := time.Now().Add(-time.Duration(seconds) * time.Second)
+				query = query.Where("sold_at >= ?", timeLimit).Order("sold_at DESC")
+			}
+		}
 	}
 
 	// Handle limit and offset
-	limit := params["limit"].(int)
-	offset := params["offset"].(int)
-	query = query.Limit(limit).Offset(offset)
+	if limit, ok := params["limit"].(int); ok && limit > 0 {
+		query = query.Limit(limit)
+	} else {
+		query = query.Limit(5) // Default limit
+	}
+
+	if offset, ok := params["offset"].(int); ok && offset >= 0 {
+		query = query.Offset(offset)
+	} else {
+		query = query.Offset(0) // Default offset
+	}
+
+	// Debug query for troubleshooting
 	query = query.Debug()
 
 	// Execute query
-	if err := query.Find(&activities).Error; err != nil {
+	if err := query.Find(&products).Error; err != nil {
 		return nil, err
 	}
 
-	return activities, nil
+	return products, nil
 }
 
 func (r *ProductRepository) GetOne(id, userId string) (*models.Product, error) {
