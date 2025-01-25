@@ -1,6 +1,6 @@
 services:
   db:
-    container_name: projectsprint-project2
+    container_name: projectsprint-project3
     image: postgres:latest
     shm_size: 1g
     command: -c 'max_connections=1000'

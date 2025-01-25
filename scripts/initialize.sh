@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker_postgresql_hostname=projectsprint-project2
+docker_postgresql_hostname=projectsprint-project3
 # TODO: get the password from .env variables
 service_password="postgres"
 
@@ -23,15 +23,15 @@ echo "Start initialize database users for postgres"
 
 # Ceate schemas
 docker exec -i $docker_postgresql_hostname \
-  psql -U postgres -d projectsone -c "CREATE SCHEMA activities;
+  psql -U postgres -d projectsone -c "CREATE SCHEMA products;
   CREATE SCHEMA logs;
   CREATE SCHEMA users;
 
-  CREATE ROLE activities_user WITH LOGIN PASSWORD '$service_password';
+  CREATE ROLE products_user WITH LOGIN PASSWORD '$service_password';
   CREATE ROLE logs_user WITH LOGIN PASSWORD '$service_password';
   CREATE ROLE users_user WITH LOGIN PASSWORD '$service_password';
 
-  GRANT ALL PRIVILEGES ON SCHEMA activities TO activities_user;
+  GRANT ALL PRIVILEGES ON SCHEMA products TO products_user;
   GRANT ALL PRIVILEGES ON SCHEMA logs TO logs_user;
   GRANT ALL PRIVILEGES ON SCHEMA users TO users_user;
   "
