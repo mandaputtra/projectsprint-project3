@@ -18,8 +18,8 @@ type File struct {
 
 type User struct {
 	ID                string `gorm:"primaryKey"`
-	Email             string
-	Phone             string
+	Email             string `gorm:"uniqueIndex:uq_email_and_phone_idx;"`
+	Phone             string `gorm:"uniqueIndex:uq_email_and_phone_idx;"`
 	Password          string `gorm:"not null"`
 	BankAccountName   string
 	BankAccountHolder string
