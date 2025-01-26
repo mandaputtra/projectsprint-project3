@@ -34,10 +34,13 @@ func setupRouter(db *gorm.DB, cfg *config.Environment) *gin.Engine {
 	{
 		v1.POST("/login/email", api.LoginWithEmail)
 		v1.POST("/register/email", api.RegisterWithEmail)
-		v1.POST("/login/phone", api.LoginWithEmail)
-		v1.POST("/register/phone", api.RegisterWithEmail)
+		v1.POST("/login/phone", api.LoginWithPhone)
+		v1.POST("/register/phone", api.RegisterWithPhone)
+
 		v1.GET("/user", utils.Authorization, api.GetUser)
 		v1.PATCH("/user", utils.Authorization, api.UpdateUser)
+
+		v1.POST("/file", api.UploadFile)
 	}
 
 	return r
