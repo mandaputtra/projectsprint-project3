@@ -52,8 +52,8 @@ func (a *APIEnv) GetUser(c *gin.Context) {
 		"bankAccountName":   user.BankAccountName,
 		"bankAccountNumber": user.BankAccountNumber,
 		"email":             user.Email,
-		"fileId":            user.FileId,
-		"fileThumbnailUri":  user.FileId,
+		"fileId":            user.File.FileID,
+		"fileThumbnailUri":  user.File.FileThumbnailUri,
 		"phone":             user.Phone,
 	})
 }
@@ -92,8 +92,8 @@ func (a *APIEnv) UpdateUser(c *gin.Context) {
 		"bankAccountName":   user.BankAccountName,
 		"bankAccountNumber": user.BankAccountNumber,
 		"email":             user.Email,
-		"fileId":            user.FileId,
-		"fileThumbnailUri":  user.FileId,
+		"fileId":            user.File.FileID,
+		"fileThumbnailUri":  user.File.FileThumbnailUri,
 		"phone":             user.Phone,
 	})
 }

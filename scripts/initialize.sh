@@ -21,19 +21,4 @@ echo "Start initialize database users for postgres"
 # 1. Create necessary schema, users, and access for database access
 # TODO: automate discovery of service and user creations
 
-# Ceate schemas
-docker exec -i $docker_postgresql_hostname \
-  psql -U postgres -d projectsone -c "CREATE SCHEMA products;
-  CREATE SCHEMA logs;
-  CREATE SCHEMA users;
-
-  CREATE ROLE products_user WITH LOGIN PASSWORD '$service_password';
-  CREATE ROLE logs_user WITH LOGIN PASSWORD '$service_password';
-  CREATE ROLE users_user WITH LOGIN PASSWORD '$service_password';
-
-  GRANT ALL PRIVILEGES ON SCHEMA products TO products_user;
-  GRANT ALL PRIVILEGES ON SCHEMA logs TO logs_user;
-  GRANT ALL PRIVILEGES ON SCHEMA users TO users_user;
-  "
-
 echo "Success create database and users"

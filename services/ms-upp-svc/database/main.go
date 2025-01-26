@@ -3,7 +3,6 @@ package database
 import (
 	"fmt"
 	"log"
-
 	"project3/services/ms-upp-svc/config"
 
 	"github.com/google/uuid"
@@ -11,15 +10,22 @@ import (
 	"gorm.io/gorm"
 )
 
+type File struct {
+	FileID           string `gorm:"primaryKey"`
+	FileUri          string `gorm:"required"`
+	FileThumbnailUri string `gorm:"required"`
+}
+
 type User struct {
 	ID                string `gorm:"primaryKey"`
-	Email             string `gorm:"unique"`
-	Phone             string `gorm:"unique"`
+	Email             string
+	Phone             string
 	Password          string `gorm:"not null"`
-	FileId            string
 	BankAccountName   string
 	BankAccountHolder string
 	BankAccountNumber string
+	FileID            string
+	File              File `gorm:"references:FileID"`
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
@@ -35,19 +41,13 @@ type Purchases struct {
 	SenderContactType   string `gorm:"required"` // "email"/"phone"
 	SenderContactDetail string `gorm:"required"`
 	PurchaseProofs      string
-	OrderItems          []PurchaseItems `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:PurchaseID"`
+	OrderItems          []PurchaseItems `gorm:"constraint:OnDelete:CASCADE;foreignKey:PurchaseID;"`
 }
 
 type PurchaseItems struct {
 	PurchaseID string `gorm:"required"`
 	ProductID  string `gorm:"required"`
 	Qty        int64  `gorm:"required"`
-}
-
-type FileID struct {
-	ID               string `gorm:"primaryKey"`
-	FileUri          string `gorm:"required"`
-	FileThumbnailUri string `gorm:"required"`
 }
 
 // Setup database
@@ -77,7 +77,7 @@ func ConnectDatabase(env config.Environment) *gorm.DB {
 	log.Printf("Connection successfull. Result from test SQL: %s\n", result)
 
 	// Migrations
-	db.AutoMigrate(&User{}, &Purchases{}, &PurchaseItems{})
+	db.AutoMigrate(&File{}, &User{}, &Purchases{}, &PurchaseItems{})
 	return db
 }
 
