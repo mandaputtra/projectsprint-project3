@@ -3,15 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
-	_ "github.com/joho/godotenv/autoload"
-	"gorm.io/gorm"
-
 	"project3/libs/utils"
 	"project3/services/ms-upp-svc/config"
 	"project3/services/ms-upp-svc/database"
 	"project3/services/ms-upp-svc/handlers"
+
+	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
+	"gorm.io/gorm"
 )
 
 // Controller
