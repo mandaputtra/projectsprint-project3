@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"project3/services/ms-upp-svc/database"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -66,7 +67,17 @@ func (a *APIEnv) UploadFile(c *gin.Context) {
 		return
 	}
 
+	// Insert to database
+	db := a.DB
+	insertedFile := database.File{
+		FileUri:          result.Location,
+		FileThumbnailUri: result.Location,
+	}
+	db.Create(&insertedFile)
+
 	c.JSON(http.StatusOK, gin.H{
-		"uri": result.Location,
+		"fileId":           insertedFile.FileID,
+		"fileUri":          result.Location,
+		"FileThumbnailUri": result.Location,
 	})
 }

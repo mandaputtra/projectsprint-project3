@@ -10,12 +10,21 @@ import (
 	"gorm.io/gorm"
 )
 
+// File
 type File struct {
 	FileID           string `gorm:"primaryKey"`
 	FileUri          string `gorm:"required"`
 	FileThumbnailUri string `gorm:"required"`
 }
 
+func (file *File) BeforeCreate(tx *gorm.DB) (err error) {
+	if file.FileID == "" {
+		file.FileID = uuid.NewString()
+	}
+	return
+}
+
+// User
 type User struct {
 	ID                string `gorm:"primaryKey"`
 	Email             string `gorm:"uniqueIndex:uq_email_and_phone_idx;"`
@@ -35,6 +44,7 @@ func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+// Purchases
 type Purchases struct {
 	ID                  string `gorm:"primaryKey"`
 	SenderName          string `gorm:"required"`
@@ -42,6 +52,13 @@ type Purchases struct {
 	SenderContactDetail string `gorm:"required"`
 	PurchaseProofs      string
 	OrderItems          []PurchaseItems `gorm:"constraint:OnDelete:CASCADE;foreignKey:PurchaseID;"`
+}
+
+func (purchase *Purchases) BeforeCreate(tx *gorm.DB) (err error) {
+	if purchase.ID == "" {
+		purchase.ID = uuid.NewString()
+	}
+	return
 }
 
 type PurchaseItems struct {
