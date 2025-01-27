@@ -53,6 +53,7 @@ func (a *APIEnv) GetUser(c *gin.Context) {
 		"bankAccountNumber": user.BankAccountNumber,
 		"email":             user.Email,
 		"fileId":            user.File.FileID,
+		"fileUri":           user.File.FileUri,
 		"fileThumbnailUri":  user.File.FileThumbnailUri,
 		"phone":             user.Phone,
 	})
@@ -70,13 +71,16 @@ func (a *APIEnv) UpdateUser(c *gin.Context) {
 	id := c.GetString("userId")
 
 	var user database.User
-	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := db.Where("id = ?", id).Preload("File").First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
 	// To update
-	// user.Email = ...
+	user.FileID = userRequest.FileID
+	user.BankAccountHolder = userRequest.BankAccountHolder
+	user.BankAccountName = userRequest.BankAccountName
+	user.BankAccountNumber = userRequest.BankAccountNumber
 
 	if err := db.Save(&user).Error; err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
@@ -93,6 +97,85 @@ func (a *APIEnv) UpdateUser(c *gin.Context) {
 		"bankAccountNumber": user.BankAccountNumber,
 		"email":             user.Email,
 		"fileId":            user.File.FileID,
+		"fileUri":           user.File.FileUri,
+		"fileThumbnailUri":  user.File.FileThumbnailUri,
+		"phone":             user.Phone,
+	})
+}
+
+func (a *APIEnv) LinkPhone(c *gin.Context) {
+	db := a.DB
+	userID := c.GetString("userId")
+
+	var userRequest dto.UserLinkPhone
+	if err := c.ShouldBindJSON(&userRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user database.User
+	if err := db.Where("id = ?", userID).Preload("File").Where("phone is ?", nil).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	user.Phone = userRequest.Phone
+
+	if err := db.Save(&user).Error; err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			c.JSON(http.StatusConflict, gin.H{"error": "Failed to update user"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"bankAccountHolder": user.BankAccountHolder,
+		"bankAccountName":   user.BankAccountName,
+		"bankAccountNumber": user.BankAccountNumber,
+		"email":             user.Email,
+		"fileId":            user.File.FileID,
+		"fileUri":           user.File.FileUri,
+		"fileThumbnailUri":  user.File.FileThumbnailUri,
+		"phone":             user.Phone,
+	})
+}
+
+func (a *APIEnv) LinkEmail(c *gin.Context) {
+	db := a.DB
+	userID := c.GetString("userId")
+
+	var userRequest dto.UserLinkEmail
+	if err := c.ShouldBindJSON(&userRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user database.User
+	if err := db.Where("id = ?", userID).Preload("File").Where("phone is ?", nil).First(&user).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	user.Email = userRequest.Email
+
+	if err := db.Save(&user).Error; err != nil {
+		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+			c.JSON(http.StatusConflict, gin.H{"error": "Failed to update user"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"bankAccountHolder": user.BankAccountHolder,
+		"bankAccountName":   user.BankAccountName,
+		"bankAccountNumber": user.BankAccountNumber,
+		"email":             user.Email,
+		"fileId":            user.File.FileID,
+		"fileUri":           user.File.FileUri,
 		"fileThumbnailUri":  user.File.FileThumbnailUri,
 		"phone":             user.Phone,
 	})
