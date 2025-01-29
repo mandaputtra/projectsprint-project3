@@ -33,6 +33,15 @@ type PurchasedItem struct {
 	Quantity  int    `json:"qty" binding:"required,min=2"`
 }
 
+type ProductCreateOrUpdateRequest struct {
+	Name     string `json:"name" binding:"required,min=4,max=32"`
+	Category string `json:"category" binding:"required,oneof=Food Beverage Clothes Furniture Tools"` // replace with actual categories
+	Qty      int    `json:"qty" binding:"required,min=1"`
+	Price    int    `json:"price" binding:"required,min=100"`
+	SKU      string `json:"sku" binding:"required,min=0,max=32"`
+	FileID   string `json:"fileId" binding:"required"`
+}
+
 type Order struct {
 	PurchasedItems      []PurchasedItem `json:"purchasedItems"`
 	SenderName          string          `json:"senderName" binding:"required,min=4,max=55"`
