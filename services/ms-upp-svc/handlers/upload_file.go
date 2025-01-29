@@ -78,6 +78,6 @@ func (a *APIEnv) UploadFile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"fileId":           insertedFile.FileID,
 		"fileUri":          result.Location,
-		"FileThumbnailUri": result.Location,
+		"fileThumbnailUri": result.Location,
 	})
 }
