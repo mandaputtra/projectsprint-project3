@@ -28,6 +28,22 @@ type UserLinkEmail struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
+type PurchasedItem struct {
+	ProductID string `json:"productId" binding:"required"`
+	Quantity  int    `json:"qty" binding:"required,min=2"`
+}
+
+type Order struct {
+	PurchasedItems      []PurchasedItem `json:"purchasedItems"`
+	SenderName          string          `json:"senderName" binding:"required,min=4,max=55"`
+	SenderContactType   string          `json:"senderContactType" binding:"required,oneof=email phone"`
+	SenderContactDetail string          `json:"senderContactDetail" binding:"required"`
+}
+
+type OrderVerify struct {
+	FileIds []string `json:"fileIds"`
+}
+
 // Custom validation function
 func ValidatePhoneNumber(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
