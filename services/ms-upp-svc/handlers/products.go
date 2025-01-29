@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"project3/services/ms-upp-svc/database"
 	"project3/services/ms-upp-svc/dto"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -77,7 +78,32 @@ func (api *APIEnv) DeleteProduct(c *gin.Context) {
 
 func (api *APIEnv) GetProducts(c *gin.Context) {
 	var products []database.Product
-	if err := api.DB.Find(&products).Error; err != nil {
+	query := api.DB
+
+	// Pagination
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+
+	// Filtering
+	if category := c.Query("category"); category != "" {
+		query = query.Where("category = ?", category)
+	}
+	if sku := c.Query("sku"); sku != "" {
+		query = query.Where("sku = ?", sku)
+	}
+	if id := c.Query("id"); id != "" {
+		query = query.Where("id = ?", id)
+	}
+
+	// Sorting
+	sortBy := c.DefaultQuery("sortBy", "newest")
+	if sortBy == "cheapest" {
+		query = query.Order("price asc")
+	} else {
+		query = query.Order("created_at desc")
+	}
+
+	if err := query.Limit(limit).Offset(offset).Find(&products).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
