@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 	"project3/services/ms-upp-svc/config"
+	"time"
 
 	"github.com/google/uuid"
-	"github.com/mandaputtra/projectsprint-projects3/services/ms-product-svc/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -68,6 +68,30 @@ type PurchaseItems struct {
 	Qty        int64  `gorm:"required"`
 }
 
+type Product struct {
+	ID        string `gorm:"primaryKey"`
+	Name      string `gorm:"type:varchar(32);null"`
+	Category  string `gorm:"type:varchar(255);not null"`
+	Qty       int    `gorm:"not null;default:1"`
+	Price     int    `gorm:"not null;default:100"`
+	Sku       string `gorm:"type:varchar(32);null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	UserID string `gorm:"not null"`
+	User   User   `gorm:"references:ID"`
+
+	FileID *string `gorm:"default:null"`
+	File   File    `gorm:"references:FileID"`
+}
+
+func (product *Product) BeforeCreate(tx *gorm.DB) (err error) {
+	if product.ID == "" {
+		product.ID = uuid.NewString()
+	}
+	return
+}
+
 // Setup database
 var db *gorm.DB
 
@@ -95,7 +119,7 @@ func ConnectDatabase(env config.Environment) *gorm.DB {
 	log.Printf("Connection successfull. Result from test SQL: %s\n", result)
 
 	// Migrations
-	db.AutoMigrate(&File{}, &User{}, &Purchases{}, &PurchaseItems{}, &models.Product{}, &models.ProductType{})
+	db.AutoMigrate(&File{}, &User{}, &Purchases{}, &PurchaseItems{}, Product{})
 	return db
 }
 

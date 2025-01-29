@@ -23,6 +23,14 @@ func Ping(c *gin.Context) {
 	})
 }
 
+func EmptyStrToNil(s string) *string {
+	print(s)
+	if s == "" {
+		return nil
+	}
+	return &s
+}
+
 func Authorization(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if !strings.HasPrefix(authHeader, "Bearer ") {
@@ -57,6 +65,10 @@ func Authorization(c *gin.Context) {
 }
 
 func CheckContentType(c *gin.Context) {
+	if c.Request.URL.Path == "/v1/file" {
+		return
+	}
+
 	if c.Request.Method == "POST" || c.Request.Method == "PATCH" {
 		if c.GetHeader("Content-Type") != "application/json" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Content-Type must be application/json"})
@@ -64,5 +76,6 @@ func CheckContentType(c *gin.Context) {
 			return
 		}
 	}
+
 	c.Next()
 }
