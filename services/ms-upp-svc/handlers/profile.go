@@ -4,6 +4,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
+	"project3/libs/utils"
 	"project3/services/ms-upp-svc/config"
 	"project3/services/ms-upp-svc/database"
 	"project3/services/ms-upp-svc/dto"
@@ -77,13 +78,17 @@ func (a *APIEnv) UpdateUser(c *gin.Context) {
 	}
 
 	// To update
-	user.FileID = userRequest.FileID
-	user.BankAccountHolder = userRequest.BankAccountHolder
-	user.BankAccountName = userRequest.BankAccountName
-	user.BankAccountNumber = userRequest.BankAccountNumber
+	result := db.Model(&user).Updates(database.User{
+		BankAccountName:   userRequest.BankAccountName,
+		BankAccountHolder: userRequest.BankAccountHolder,
+		BankAccountNumber: userRequest.BankAccountNumber,
+		FileID:            utils.EmptyStrToNil(userRequest.FileID),
+	})
 
-	if err := db.Save(&user).Error; err != nil {
-		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+	print(utils.EmptyStrToNil(userRequest.FileID), "here")
+
+	if result.Error != nil {
+		if strings.Contains(result.Error.Error(), "duplicate key value violates unique constraint") {
 			c.JSON(http.StatusConflict, gin.H{"error": "Failed to update user"})
 			return
 		}
