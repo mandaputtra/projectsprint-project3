@@ -114,14 +114,13 @@ func (a *APIEnv) LinkPhone(c *gin.Context) {
 	}
 
 	var user database.User
-	if err := db.Where("id = ?", userID).Preload("File").Where("phone is ?", nil).First(&user).Error; err != nil {
+	if err := db.Where("id = ?", userID).Preload("File").Where("phone = ?", "").First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
-	user.Phone = userRequest.Phone
-
-	if err := db.Save(&user).Error; err != nil {
+	if err := db.Model(&user).Where("id = ?", userID).Update("phone", userRequest.Phone).Error; err != nil {
+		print(err)
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			c.JSON(http.StatusConflict, gin.H{"error": "Failed to update user"})
 			return
@@ -158,9 +157,7 @@ func (a *APIEnv) LinkEmail(c *gin.Context) {
 		return
 	}
 
-	user.Email = userRequest.Email
-
-	if err := db.Save(&user).Error; err != nil {
+	if err := db.Model(&user).Where("id = ?", userID).Update("email", userRequest.Email).Error; err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 			c.JSON(http.StatusConflict, gin.H{"error": "Failed to update user"})
 			return
