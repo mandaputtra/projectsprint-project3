@@ -74,15 +74,15 @@ type Product struct {
 	Category  string `gorm:"type:varchar(255);not null"`
 	Qty       int    `gorm:"not null;default:1"`
 	Price     int    `gorm:"not null;default:100"`
-	Sku       string `gorm:"type:varchar(32);null"`
+	SKU       string `gorm:"type:varchar(32);null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
 	UserID string `gorm:"not null"`
 	User   User   `gorm:"references:ID"`
 
-	FileID *string `gorm:"default:null"`
-	File   File    `gorm:"references:FileID"`
+	FileID string `gorm:"default:null"`
+	File   File   `gorm:"references:FileID"`
 }
 
 func (product *Product) BeforeCreate(tx *gorm.DB) (err error) {
