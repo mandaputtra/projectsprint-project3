@@ -51,6 +51,9 @@ func setupRouter(db *gorm.DB, cfg *config.Environment) *gin.Engine {
 		v1.POST("/user/link/email", utils.Authorization, api.LinkEmail)
 
 		v1.POST("/file", api.UploadFile)
+
+		v1.POST("/purchase", api.UploadFile)
+		v1.POST("/purchase/:purchaseId", api.UploadFile)
 	}
 
 	return r
