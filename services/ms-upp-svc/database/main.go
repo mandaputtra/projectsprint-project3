@@ -6,6 +6,7 @@ import (
 	"project3/services/ms-upp-svc/config"
 
 	"github.com/google/uuid"
+	"github.com/mandaputtra/projectsprint-projects3/services/ms-product-svc/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -33,8 +34,8 @@ type User struct {
 	BankAccountName   string
 	BankAccountHolder string
 	BankAccountNumber string
-	FileID            string
-	File              File `gorm:"references:FileID"`
+	FileID            string `gorm:"default:null"`
+	File              File   `gorm:"references:FileID"`
 }
 
 func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
@@ -94,7 +95,7 @@ func ConnectDatabase(env config.Environment) *gorm.DB {
 	log.Printf("Connection successfull. Result from test SQL: %s\n", result)
 
 	// Migrations
-	db.AutoMigrate(&File{}, &User{}, &Purchases{}, &PurchaseItems{})
+	db.AutoMigrate(&File{}, &User{}, &Purchases{}, &PurchaseItems{}, &models.Product{}, &models.ProductType{})
 	return db
 }
 
